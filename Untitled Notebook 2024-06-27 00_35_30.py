@@ -1,11 +1,13 @@
 # Databricks notebook source
-access_key1 = 'Szm6BbKUvSaUBED/'
-access_key2= 'f6NOFxHHsLFQKrg5TLjGqaaGqI8I6GtzfoC1H+N9plmKdg9eXGJD5aV9c2Hq+AStcVhr8g=='
+# Vulnerability Issue Should be Fixed before Push Code to Git hub
+access_key1 = 'P+wSfElx34Z/H120WdB/'
+access_key2= '0/rF8dD+TVSY2H43sRPTWJqimAWY94Xkd23HXjt2eSSr0EYdVW/XHuqB+AStEbOvNA=='
 access_key = access_key1 + access_key2
+print(access_key)
 
 # Specify the container and account name
 container_name = "continer1"
-account_name = "insuranceaccount1"
+account_name = "gitpush"
 
 # Mount point in DBFS
 mount_point = "/mnt/adls"
