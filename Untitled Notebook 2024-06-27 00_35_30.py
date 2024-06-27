@@ -1,10 +1,15 @@
 # Databricks notebook source
+pip install pandas
+
+# COMMAND ----------
+
 # Databricks notebook source
 # Required imports
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, explode, sum as _sum, count as _count, month, year, avg as _avg
 from pyspark.sql.types import IntegerType, StringType, DoubleType, DateType, ArrayType, StructType, StructField
-
+import pandas as pd
+import os
 
 # Vulnerability Issue Should be Fixed before Push Code to Git hub
 access_key1 = 'P+wSfElx34Z/H120WdB/'
@@ -70,12 +75,22 @@ exploded_df = flattened_df.withColumn("claim_amount", explode("claims")).drop("c
 exploded_df.show(truncate=False)
 
 
-# Path to save the CSV file
-csv_file_path = f'{mount_point}/output/shield.csv'
 
-# Write the DataFrame to a CSV file
-exploded_df.write.csv(csv_file_path, header=True)
+# COMMAND ----------
 
-# Verify the CSV file is written
-display(dbutils.fs.ls(f'{mount_point}/output'))
+# Assuming you have defined your Azure MySQL connection details
+mysql_url = "jdbc:mysql://{host}:{port}/{database}".format(
+    host="azureserverdatabricks.mysql.database.azure.com",
+    port="3306",  # Replace with your MySQL port if different
+    database="insurance"
+)
+
+mysql_properties = {
+    "user": "nilesh",
+    "password": "Sanco@95",
+    "driver": "com.mysql.cj.jdbc.Driver"
+}
+
+# Write the DataFrame to MySQL
+exploded_df.write.jdbc(url=mysql_url, table="empdata", mode="overwrite", properties=mysql_properties)
 
