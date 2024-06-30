@@ -296,13 +296,13 @@ files = dbutils.fs.ls(gold_path_claim_policy)
 part_file = [file for file in files if file.name.startswith("part-00000") and file.name.endswith(".csv")]
 # If the part file is found, move and rename it to bronze.csv
 if part_file:
-    dbutils.fs.mv(part_file[0].path, f"{gold_path_claim_policy}/gold_path_claim_policy.csv")
+    dbutils.fs.mv(part_file[0].path, f"{gold_path_claim_policy}/claim_policy_and_amount.csv")
 # Clean up any other files that were created during the write process (e.g., _SUCCESS file)
 for file in files:
     if not file.name.endswith(".csv"):
         dbutils.fs.rm(file.path, True)
 
-print("Rename Sucessfully in gold_path_claim_policy")
+print("Rename Sucessfully in claim_policy_and_amount")
 
 # COMMAND ----------
 
@@ -317,14 +317,14 @@ files = dbutils.fs.ls(gold_path_age_group)
 part_file = [file for file in files if file.name.startswith("part-00000") and file.name.endswith(".csv")]
 # If the part file is found, move and rename it to bronze.csv
 if part_file:
-    dbutils.fs.mv(part_file[0].path, f"{gold_path_age_group}/gold_path_age_group.csv")
+    dbutils.fs.mv(part_file[0].path, f"{gold_path_age_group}/age_group_distribution.csv")
 # Clean up any other files that were created during the write process (e.g., _SUCCESS file)
 for file in files:
     if not file.name.endswith(".csv"):
 
         dbutils.fs.rm(file.path, True)
 
-print("Rename Sucessfully in gold_path_age_group")
+print("Rename Sucessfully in age_group_distribution")
 
 # COMMAND ----------
 
@@ -339,13 +339,13 @@ files = dbutils.fs.ls(gold_path_acquisition_channel)
 part_file = [file for file in files if file.name.startswith("part-00000") and file.name.endswith(".csv")]
 # If the part file is found, move and rename it to bronze.csv
 if part_file:
-    dbutils.fs.mv(part_file[0].path, f"{gold_path_acquisition_channel}/gold_path_acquisition_channel.csv")
+    dbutils.fs.mv(part_file[0].path, f"{gold_path_acquisition_channel}/acquisition_channel_distribution.csv")
 # Clean up any other files that were created during the write process (e.g., _SUCCESS file)
 for file in files:
     if not file.name.endswith(".csv"):
         dbutils.fs.rm(file.path, True)
 
-print("Rename Sucessfully in Silver")
+print("Rename Sucessfully in acquisition_channel_distribution")
 
 # COMMAND ----------
 
@@ -360,29 +360,34 @@ files = dbutils.fs.ls(gold_path_city_distribution)
 part_file = [file for file in files if file.name.startswith("part-00000") and file.name.endswith(".csv")]
 # If the part file is found, move and rename it to bronze.csv
 if part_file:
-    dbutils.fs.mv(part_file[0].path, f"{gold_path_city_distribution}/gold_path_city_distribution.csv")
+    dbutils.fs.mv(part_file[0].path, f"{gold_path_city_distribution}/city_distribution.csv")
 # Clean up any other files that were created during the write process (e.g., _SUCCESS file)
 for file in files:
     if not file.name.endswith(".csv"):
         dbutils.fs.rm(file.path, True)
 
-print("Rename Sucessfully in gold_path_city_distribution")
+print("Rename Sucessfully in city_distribution")
 
 # COMMAND ----------
 
 # Write the Data into Gold layer - PART 5
-# # Assuming you have defined your Azure MySQL connection details
-# mysql_url = "jdbc:mysql://{host}:{port}/{database}".format(
-#     host="azureserverdatabricks.mysql.database.azure.com",
-#     port="3306",  # Replace with your MySQL port if different
-#     database="insurance"
-# )
+# Define the connection details
+host = "sancodbserver.mysql.database.azure.com"
+port = "3306"
+database = "insurance"
 
-# mysql_properties = {
-#     "user": "nilesh",
-#     "password": "Sanco@95",
-#     "driver": "com.mysql.cj.jdbc.Driver"
-# }
+# Define MySQL connection properties
+mysql_properties = {
+    "url": f"jdbc:mysql://{host}:{port}/{database}",
+    "user": "nilesh",
+    "password": "Sanco@95",    
+    "driver": "com.mysql.cj.jdbc.Driver"
+}
 
-# # Write the DataFrame to MySQL
-# exploded_df.write.jdbc(url=mysql_url, table="empdata", mode="overwrite", properties=mysql_properties)
+# Write the DataFrame to MySQL
+silverdf.write.format("jdbc").mode("append").option("dbtable", "InsuranceTransactions").options(**mysql_properties).save()
+transformed_df.write.format("jdbc").mode("append").option("dbtable", "transformed_df").options(**mysql_properties).save()
+age_group_distribution.write.format("jdbc").mode("append").option("dbtable", "age_group_distribution").options(**mysql_properties).save()
+acquisition_channel_distribution.write.format("jdbc").mode("append").option("dbtable", "acquisition_channel_distribution").options(**mysql_properties).save()
+city_distribution.write.format("jdbc").mode("append").option("dbtable", "city_distribution").options(**mysql_properties).save()
+
